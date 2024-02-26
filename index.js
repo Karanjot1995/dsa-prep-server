@@ -12,9 +12,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/api', routes)
 
-const uri = "mongodb+srv://admin:fiMlKVcknjt17K3M@dsa.xwiyywl.mongodb.net/dsa"
-// const uri = "mongodb+srv://admin:fiMlKVcknjt17K3M@dsa.xwiyywl.mongodb.net/?retryWrites=true&w=majority&appName=dsa";
-
+const uri = process.env.MONGO_URL;
 
 mongoose.connect(uri);
 const database = mongoose.connection
