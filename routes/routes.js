@@ -25,7 +25,7 @@ router.post('/create', async (req, res) => {
       res.status(200).json(data)
     }
     catch (error) {
-        res.status(400).json({message: error.message})
+        res.status(400).json({error: error.message})
     }
   }else{
     let data = new Question({
@@ -40,10 +40,10 @@ router.post('/create', async (req, res) => {
     })
     try {
       const dataToSave = data.save();
-      res.status(200).json(dataToSave)
+      res.status(200).json(data)
     }
     catch (error) {
-        res.status(400).json({message: error.message})
+        res.status(400).json({error: error.message})
     }
   }
 })
@@ -58,7 +58,7 @@ router.post('/update-solved', async (req, res) => {
     res.status(200).json(data)
   }
   catch (error) {
-      res.status(400).json({message: error.message})
+      res.status(400).json({error: error.message})
   }
 })
 
@@ -75,7 +75,7 @@ router.get('/all', async (req, res) => {
     res.send(Object.values(tags))
   }
   catch(error){
-    res.status(500).json({message: error.message})
+    res.status(500).json({error: error.message})
   }
 })
 
@@ -86,7 +86,7 @@ router.get('/question/:id', async (req, res) => {
     res.status(200).json(data)
   }
   catch(error){
-    res.status(500).json({message: error.message})
+    res.status(500).json({error: error.message})
   }
 })
 
@@ -96,7 +96,22 @@ router.get('/tags', async (req, res) => {
     res.send(tags)
   }
   catch(error){
-    res.status(500).json({message: error.message})
+    res.status(500).json({error: error.message})
+  }
+})
+
+//Delete by ID Method
+router.delete('/delete/', async (req, res) => {
+  let result = await Question.deleteOne({_id: req.body.id});
+  try{
+    if (result.deletedCount === 1) {
+      res.status(200).json('Successfully Deleted')
+    }else{
+      res.status(200).json('No records found')
+    }
+  }
+  catch(error){
+    res.status(500).json({error: error.message})
   }
 })
 

@@ -14,6 +14,7 @@ app.use('/api', routes)
 
 const uri = process.env.MONGO_URL;
 
+
 mongoose.connect(uri);
 const database = mongoose.connection
 
