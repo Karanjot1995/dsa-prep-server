@@ -64,7 +64,6 @@ router.post('/update-solved',requireAuth, async (req, res) => {
 })
 
 router.get('/all', requireAuth, async (req, res) => {
-  console.log(req.user)
   try{
     const questions = await Question.find({uid:req.user._id, uid:req.user._id});
     // await Question.updateMany({solved: 1}, {$set:{uid: "65de63ab8b1962e13f2f1c97"}})
