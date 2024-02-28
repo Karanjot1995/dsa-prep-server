@@ -1,4 +1,3 @@
-const { Int32, Double } = require('mongodb');
 const mongoose = require('mongoose');
 
 const tagSchema = new mongoose.Schema({

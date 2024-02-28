@@ -1,15 +1,15 @@
 const express = require('express');
 
 const router = express.Router()
-module.exports = router;
 const Question = require('../models/question');
 const Tag = require('../models/tag');
+const requireAuth = require("../middlewares/requireAuth");
 
 
-router.post('/create', async (req, res) => {
+router.post('/create',requireAuth, async (req, res) => {
   if(req.body.id){
     const options = { upsert: true };
-    let data = await Question.updateOne({_id:req.body.id}, {
+    let data = await Question.updateOne({_id:req.body.id, uid:req.user._id}, {
       $set: {
         title: req.body.title,
         description: req.body.description,
@@ -37,6 +37,7 @@ router.post('/create', async (req, res) => {
       difficulty: req.body.difficulty,
       solved:1,
       version: req.body.version,
+      uid: req.user._id
     })
     try {
       const dataToSave = data.save();
@@ -48,8 +49,8 @@ router.post('/create', async (req, res) => {
   }
 })
 
-router.post('/update-solved', async (req, res) => {
-  let data = await Question.updateOne({_id:req.body.id}, {
+router.post('/update-solved',requireAuth, async (req, res) => {
+  let data = await Question.updateOne({_id:req.body.id, uid:req.user._id}, {
     $set: {
       solved: req.body.is_solved?1:0
     }
@@ -62,9 +63,11 @@ router.post('/update-solved', async (req, res) => {
   }
 })
 
-router.get('/all', async (req, res) => {
+router.get('/all', requireAuth, async (req, res) => {
+  console.log(req.user)
   try{
-    const questions = await Question.find();
+    const questions = await Question.find({uid:req.user._id, uid:req.user._id});
+    // await Question.updateMany({solved: 1}, {$set:{uid: "65de63ab8b1962e13f2f1c97"}})
     const allTags = await Tag.find();
     let tags = {}
     allTags.map(t=>tags[t._id]={_id: t._id, title:t.title, questions:[], tag_id: t.tag_id})
@@ -80,9 +83,9 @@ router.get('/all', async (req, res) => {
 })
 
 
-router.get('/question/:id', async (req, res) => {
+router.get('/question/:id',requireAuth, async (req, res) => {
   try{
-    const data = await Question.findOne({_id:req.params.id});
+    const data = await Question.findOne({_id:req.params.id, uid:req.user._id});
     res.status(200).json(data)
   }
   catch(error){
@@ -101,8 +104,8 @@ router.get('/tags', async (req, res) => {
 })
 
 //Delete by ID Method
-router.delete('/delete/', async (req, res) => {
-  let result = await Question.deleteOne({_id: req.body.id});
+router.delete('/delete/',requireAuth, async (req, res) => {
+  let result = await Question.deleteOne({_id: req.body.id, uid:req.user._id});
   try{
     if (result.deletedCount === 1) {
       res.status(200).json('Successfully Deleted')
@@ -114,6 +117,9 @@ router.delete('/delete/', async (req, res) => {
     res.status(500).json({error: error.message})
   }
 })
+
+
+module.exports = router;
 
 // router.get('/hello', (req, res) => {
 //   res.send('Hello')

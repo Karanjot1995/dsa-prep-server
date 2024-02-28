@@ -4,7 +4,7 @@ const express = require("express");
 const cors = require("cors");
 const Axios = require("axios");
 const mongoose = require('mongoose')
-const routes = require('./routes/routes');
+const routes = require('./routes');
 
 const PORT = 8000;
 const app = express();

@@ -24,6 +24,9 @@ const questionSchema = new mongoose.Schema({
     },
     version: {
       type: String
+    },
+    uid:{
+      type: String
     }
 })
 
