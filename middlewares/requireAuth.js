@@ -21,9 +21,8 @@ module.exports = (req, res, next) => {
     if (err) {
       return res.status(403).send("Could not verify token");
     }
-
     const { email } = payload;
     req.user = payload;
+    next();
   });
-  next();
 };

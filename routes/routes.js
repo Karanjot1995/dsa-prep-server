@@ -73,7 +73,6 @@ router.get('/all', requireAuth, async (req, res) => {
     questions.map(q=>{
       q.tags.map(id=>tags[id]&&tags[id].questions.push(q))
     })
-
     res.send(Object.values(tags))
   }
   catch(error){
