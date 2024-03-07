@@ -63,9 +63,26 @@ router.post('/update-solved',requireAuth, async (req, res) => {
   }
 })
 
-router.get('/all', requireAuth, async (req, res) => {
+router.get('/my-questions', requireAuth, async (req, res) => {
   try{
-    const questions = await Question.find({uid:req.user._id, uid:req.user._id});
+    const questions = await Question.find({uid:req.user._id});
+    // await Question.updateMany({solved: 1}, {$set:{uid: "65de63ab8b1962e13f2f1c97"}})
+    const allTags = await Tag.find();
+    let tags = {}
+    allTags.map(t=>tags[t._id]={_id: t._id, title:t.title, questions:[], tag_id: t.tag_id})
+    questions.map(q=>{
+      q.tags.map(id=>tags[id]&&tags[id].questions.push(q))
+    })
+    res.send(Object.values(tags))
+  }
+  catch(error){
+    res.status(500).json({error: error.message})
+  }
+})
+
+router.get('/questions/:id', requireAuth, async (req, res) => {
+  try{
+    const questions = await Question.find({uid:req.params.id});
     // await Question.updateMany({solved: 1}, {$set:{uid: "65de63ab8b1962e13f2f1c97"}})
     const allTags = await Tag.find();
     let tags = {}
@@ -81,9 +98,9 @@ router.get('/all', requireAuth, async (req, res) => {
 })
 
 
-router.get('/question/:id',requireAuth, async (req, res) => {
+router.get('/question/:id', async (req, res) => {
   try{
-    const data = await Question.findOne({_id:req.params.id, uid:req.user._id});
+    const data = await Question.findOne({_id: req.params.id});
     res.status(200).json(data)
   }
   catch(error){

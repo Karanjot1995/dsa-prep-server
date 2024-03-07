@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 require("dotenv").config(); // Load the .env file
 const requireAuth = require("../middlewares/requireAuth");
+const Question = require("../models/question");
 
 router.post("/sign-up", async (req, res) => {
   try {
@@ -24,7 +25,6 @@ router.post("/sign-up", async (req, res) => {
     //Hashing a Password
     bcrypt.hash(password, saltRounds, (err, hash) => {
       if (err) {
-        console.log(err);
         throw new Error("Internal Server Error");
       }
 
@@ -39,8 +39,8 @@ router.post("/sign-up", async (req, res) => {
         return res.json({ message: "User created successfully", user });
       });
     });
-  } catch (err) {
-    res.status(401).send(err.message);
+  } catch (error) {
+    res.status(401).send(error.message);
   }
 });
 
@@ -70,7 +70,30 @@ router.post("/sign-in", async (req, res) => {
       return res.status(401).json({ message: "Invalid Credentials" });
     });
   } catch (error) {
-    res.status(401).send(err.message);
+    res.status(401).send(error.message);
+  }
+});
+
+router.get("/all", async (req, res) => {
+  try {
+    // let data = []
+    let users = await User.find({}).select("-password").then();
+    
+    let data = users.map(async u=>{
+      u = u.toObject()
+      u['questions'] = []
+      await Question.find({uid:u._id}).then(res=>{
+        if(res){
+          u.questions = res
+        }
+      })
+      return u
+    })
+
+    res.status(200).json(await Promise.all(data))
+    
+  } catch (error) {
+    res.status(401).send(error.message);
   }
 });
 
