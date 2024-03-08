@@ -4,6 +4,7 @@ const router = express.Router()
 const Question = require('../models/question');
 const Tag = require('../models/tag');
 const requireAuth = require("../middlewares/requireAuth");
+const User = require("../models/user");
 
 
 router.post('/create',requireAuth, async (req, res) => {
@@ -85,12 +86,13 @@ router.get('/questions/:id', requireAuth, async (req, res) => {
     const questions = await Question.find({uid:req.params.id});
     // await Question.updateMany({solved: 1}, {$set:{uid: "65de63ab8b1962e13f2f1c97"}})
     const allTags = await Tag.find();
+    const user = await User.find({_id:req.params.id}).select("-password");
     let tags = {}
     allTags.map(t=>tags[t._id]={_id: t._id, title:t.title, questions:[], tag_id: t.tag_id})
     questions.map(q=>{
       q.tags.map(id=>tags[id]&&tags[id].questions.push(q))
     })
-    res.send(Object.values(tags))
+    res.send({user:user, questions:Object.values(tags)})
   }
   catch(error){
     res.status(500).json({error: error.message})

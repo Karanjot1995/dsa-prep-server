@@ -61,9 +61,10 @@ router.post("/sign-in", async (req, res) => {
     bcrypt.compare(password, user.password, (err, result) => {
       if (result) {
         const token = jwt.sign({ email, _id:user._id }, JWT_SECRET);
+        let u = {email, id:user._id}
         return res
           .status(200)
-          .json({ message: "User Logged in Sucessfully", token });
+          .json({ message: "User Logged in Sucessfully", token, user:u });
       }
 
       console.log(err);
